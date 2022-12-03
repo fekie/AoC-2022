@@ -17,14 +17,6 @@ enum Outcome {
     Loss,
 }
 
-/// Tells the user whether they should cause a win,
-/// draw, or loss.
-enum Signal {
-    Win,
-    Draw,
-    Loss,
-}
-
 fn main() {
     let (enemy_hands, user_hands) = hand_sequences();
 
@@ -90,16 +82,18 @@ fn total_outcome_score(enemy_hands: &[Hand], user_hands: &[Hand]) -> u64 {
     score
 }
 
-fn signal_sequence() -> Vec<Signal> {
+/// Tells the user whether they should cause a win,
+/// draw, or loss.
+fn signal_sequence() -> Vec<Outcome> {
     let lines = RAW_INPUT.lines().filter(|x| !x.is_empty());
 
     let mut signals = Vec::new();
 
     for line in lines {
         let signal = match line.split_whitespace().collect::<Vec<&str>>()[1] {
-            "X" => Signal::Loss,
-            "Y" => Signal::Draw,
-            "Z" => Signal::Win,
+            "X" => Outcome::Loss,
+            "Y" => Outcome::Draw,
+            "Z" => Outcome::Win,
             _ => panic!(),
         };
 
@@ -109,14 +103,14 @@ fn signal_sequence() -> Vec<Signal> {
     signals
 }
 
-fn signals_to_hands(enemy_hands: &[Hand], signals: &[Signal]) -> Vec<Hand> {
+fn signals_to_hands(enemy_hands: &[Hand], signals: &[Outcome]) -> Vec<Hand> {
     let mut user_hands = Vec::new();
 
     for (enemy_hand, signal) in enemy_hands.iter().zip(signals) {
         let user_hand = match signal {
-            Signal::Win => enemy_hand.winning_hand(),
-            Signal::Draw => enemy_hand.draw_hand(),
-            Signal::Loss => enemy_hand.losing_hand(),
+            Outcome::Win => enemy_hand.winning_hand(),
+            Outcome::Draw => enemy_hand.draw_hand(),
+            Outcome::Loss => enemy_hand.losing_hand(),
         };
         user_hands.push(user_hand);
     }
