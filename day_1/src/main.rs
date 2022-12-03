@@ -27,19 +27,14 @@ fn main() {
     }
 
     elf_cal_counts.sort();
+    elf_cal_counts.reverse();
 
     println!(
         "Most Calories Held By Elf: {}",
-        elf_cal_counts[elf_cal_counts.len() - 1]
+        elf_cal_counts.iter().take(1).sum::<u64>()
     );
 
-    let top_three_total = {
-        let mut total = 0;
-        for _ in 0..3 {
-            total += elf_cal_counts.pop().unwrap()
-        }
-        total
-    };
+    let top_three_total = elf_cal_counts.iter().take(3).sum::<u64>();
 
     println!("Most Calories Held By Top 3 Elves: {}", top_three_total);
 }
