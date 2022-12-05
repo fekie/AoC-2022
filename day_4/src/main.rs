@@ -4,7 +4,6 @@ use std::ops::RangeInclusive;
 
 const INPUT: &str = include_str!("../input.txt");
 
-#[derive(Debug)]
 struct AssignmentPair {
     first_elf: RangeInclusive<u64>,
     second_elf: RangeInclusive<u64>,
@@ -20,6 +19,7 @@ fn main() {
         fully_overlapping_pairs_amount
     );
 
+    // Part 2
     let partially_overlapping = amount_of_partially_overlapping_pairs(&all_assignments);
     println!(
         "Amount Of Partially Overlapping Pairs: {}",
