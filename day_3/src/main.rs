@@ -1,3 +1,5 @@
+// https://adventofcode.com/2022/day/3/
+
 const INPUT: &str = include_str!("../input.txt");
 const ASCII_OFFSET: i32 = -96;
 const UPPERCASE_OFFSET: i32 = 26;
