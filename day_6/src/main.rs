@@ -1,3 +1,5 @@
+// https://adventofcode.com/2022/day/6
+
 use std::collections::HashSet;
 
 const INPUT: &str = include_str!("../input.txt");
