@@ -1,3 +1,5 @@
+// https://adventofcode.com/2022/day/9
+
 use std::collections::HashSet;
 
 const INPUT: &str = include_str!("../input.txt");
@@ -31,27 +33,21 @@ struct World {
 }
 
 fn main() {
-    let movements = vec![
-        Movement {
-            units: 5,
-            movement_type: MovementType::Up,
-        },
-        Movement {
-            units: 3,
-            movement_type: MovementType::Right,
-        },
-        Movement {
-            units: 1,
-            movement_type: MovementType::Down,
-        },
-    ];
-    //let movements = generate_movements();
+    let movements = generate_movements();
+
+    // Part 1
     let mut world = World::new(2);
 
     world.process_movements(&movements);
 
-    println!("Tail Positions Visited: {}", world.visited_len());
-    dbg!(world.knots);
+    println!("Tail Positions Visited (2 Knots): {}", world.visited_len());
+
+    // Part 2
+    let mut world = World::new(10);
+
+    world.process_movements(&movements);
+
+    println!("Tail Positions Visited (10 Knots): {}", world.visited_len());
 }
 
 fn generate_movements() -> Vec<Movement> {
@@ -133,33 +129,27 @@ impl World {
         let x_change = self.knots[prev_knot_index].x - self.knots[knot_index].x;
         let y_change = self.knots[prev_knot_index].y - self.knots[knot_index].y;
 
-        dbg!(y_change);
-
         assert!(x_change < 3);
         assert!(y_change < 3);
-
-        /* dbg!(self.knots[prev_knot_index]);
-        dbg!(self.knots[knot_index]);
-        dbg!(x_change, y_change); */
 
         let mut x_change_needed = match (x_change % 2) == 0 {
             true => x_change / 2,
             false => x_change,
         };
 
-        let mut y_change_needed = match (x_change % 2) == 0 {
+        let mut y_change_needed = match (y_change % 2) == 0 {
             true => y_change / 2,
             false => y_change,
         };
 
-        // We need this hack for literal corner cases.
-        if y_change != 0 && y_change.abs() < x_change.abs() {
-            dbg!(y_change);
-            y_change_needed += y_change
-        }
+        if (x_change.abs() + y_change.abs()) == 3 {
+            if y_change.abs() < x_change.abs() {
+                y_change_needed = y_change;
+            }
 
-        if x_change != 0 && x_change.abs() < y_change.abs() {
-            x_change_needed += x_change
+            if x_change.abs() < y_change.abs() {
+                x_change_needed = x_change;
+            }
         }
 
         Position {
