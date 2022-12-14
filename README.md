@@ -2,4 +2,4 @@
 https://adventofcode.com/2022
 
 # Info
-These are  my personal answers for AoC 2022, some solutions may be revised.
+These are  my personal solutions for AoC 2022.
