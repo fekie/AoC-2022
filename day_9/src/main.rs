@@ -103,20 +103,10 @@ impl World {
                 };
 
                 self.update_knot_position(knot_index, position_change);
-                /* if let Some(movement_type) = next_movement_type {
-                    self.update_knot_position(knot_index, movement_type);
-                } */
-
-                // Find out next
             }
 
             self.add_tail_position_to_visited();
-
-            /* self.update_head_one_step(movement.movement_type);
-            self.update_trailing_knot_one_step(movement.movement_type);
-            self.add_tail_position_to_visited(); */
         }
-        //panic!("aaa");
     }
 
     fn position_change_needed(&self, knot_index: usize) -> Position {
@@ -173,15 +163,6 @@ impl World {
         self.knots[knot_index].y += position_change.y;
     }
 
-    /* fn update_tail_one_step(&mut self, head_movement_type: MovementType) {
-        if !self.is_tail_touching() {
-            let new_tail_pos = self.new_tail_position(head_movement_type);
-
-            self.tail.x = new_tail_pos.x;
-            self.tail.y = new_tail_pos.y;
-        }
-    } */
-
     /// Adds visited tail positions to self.visited
     fn add_tail_position_to_visited(&mut self) {
         self.visited.insert(*self.knots.iter().last().unwrap());
@@ -206,37 +187,7 @@ impl World {
 
         (x_min..=x_max).contains(&self.knots[knot_index].x)
             && (y_min..=y_max).contains(&self.knots[knot_index].y)
-
-        /* let x_max = self.head.x + 1;
-        let x_min = self.head.x - 1;
-
-        let y_max = self.head.y + 1;
-        let y_min = self.head.y - 1;
-
-        (x_min..=x_max).contains(&self.tail.x) && (y_min..=y_max).contains(&self.tail.y) */
     }
-
-    // Assumes the tail is not touching.
-    /* fn new_tail_position(&self, head_movement_type: MovementType) -> Position {
-        match head_movement_type {
-            MovementType::Up => Position {
-                x: self.head.x,
-                y: self.head.y - 1,
-            },
-            MovementType::Right => Position {
-                x: self.head.x - 1,
-                y: self.head.y,
-            },
-            MovementType::Down => Position {
-                x: self.head.x,
-                y: self.head.y + 1,
-            },
-            MovementType::Left => Position {
-                x: self.head.x + 1,
-                y: self.head.y,
-            },
-        }
-    } */
 }
 
 #[cfg(test)]
@@ -294,11 +245,7 @@ mod test {
 
         world.process_movements(&movements);
 
-        // trouble is here.
         assert_eq!(world.knots[0], Position { x: 2, y: 3 });
         assert_eq!(world.knots[1], Position { x: 2, y: 4 });
-
-        /* dbg!(world.knots);
-        todo!() */
     }
 }
