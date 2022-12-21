@@ -1,3 +1,5 @@
+// https://adventofcode.com/2022/day/11
+
 use std::cell::RefCell;
 
 const INPUT: &str = include_str!("../input.txt");
@@ -5,22 +7,22 @@ const INPUT: &str = include_str!("../input.txt");
 /// If the inner value is `None`, it means to do the operation with itself (old * old).
 #[derive(Debug)]
 enum Operation {
-    Add(Option<u128>),
-    Multiply(Option<u128>),
+    Add(Option<u64>),
+    Multiply(Option<u64>),
 }
 
 #[derive(Debug)]
 struct Monkey {
     // We have to use a RefCell here as we need to mutably
     // change values, but not at the same time.
-    items: RefCell<Vec<u128>>,
+    items: RefCell<Vec<u64>>,
     operation: Operation,
-    divisible_by: u128,
+    divisible_by: u64,
     // If the worry value is divisble by self.divisble_by, throw to this monkey.
     on_success: usize,
     // Follows the same logic as self.on_succes
     on_fail: usize,
-    total_inspections: RefCell<u128>,
+    total_inspections: RefCell<u64>,
 }
 
 fn main() {
@@ -45,11 +47,11 @@ fn main() {
     println!("Monkey Business (Part 2): {monkey_business}")
 }
 
-fn calculate_monkey_business(monkeys: &[Monkey]) -> u128 {
+fn calculate_monkey_business(monkeys: &[Monkey]) -> u64 {
     let mut inspection_totals = monkeys
         .iter()
         .map(|x| *x.total_inspections.borrow())
-        .collect::<Vec<u128>>();
+        .collect::<Vec<u64>>();
 
     inspection_totals.sort();
 
@@ -60,15 +62,16 @@ fn calculate_monkey_business(monkeys: &[Monkey]) -> u128 {
 }
 
 fn run_cycle(monkeys: &mut [Monkey], drop_worry_levels: bool) {
+    // This is the factor we can modulo by and not have checks affected
+    let shared_factor = monkeys.iter().map(|x| x.divisible_by).product::<u64>();
+
     for monkey in monkeys.iter() {
         // We drain as we're going to be moving these values to another inventory each time
-        for mut item in monkey.items.borrow_mut().drain(..).collect::<Vec<u128>>() {
+        for mut item in monkey.items.borrow_mut().drain(..).collect::<Vec<u64>>() {
             // For each item we increment the total inspections
             // Yes I have to assign values like this so they don't conflict
             let new_total_inspections = *monkey.total_inspections.borrow() + 1;
             *monkey.total_inspections.borrow_mut() = new_total_inspections;
-
-            dbg!(&item);
 
             // We do the monkey operation
             item = match monkey.operation {
@@ -86,6 +89,8 @@ fn run_cycle(monkeys: &mut [Monkey], drop_worry_levels: bool) {
             if drop_worry_levels {
                 item /= 3;
             }
+
+            item %= shared_factor;
 
             // We do the test and then throw it if needed
             match (item % monkey.divisible_by) == 0 {
@@ -106,8 +111,8 @@ fn generate_monkeys() -> Vec<Monkey> {
             let items = RefCell::new(
                 monkey_data[1].trim()[("Starting items: ").len()..]
                     .split(", ")
-                    .map(|x| x.parse::<u128>().unwrap())
-                    .collect::<Vec<u128>>(),
+                    .map(|x| x.parse::<u64>().unwrap())
+                    .collect::<Vec<u64>>(),
             );
 
             let operation = {
@@ -123,7 +128,7 @@ fn generate_monkeys() -> Vec<Monkey> {
             };
 
             let divisible_by = monkey_data[3].trim()["Test: divisible by ".len()..]
-                .parse::<u128>()
+                .parse::<u64>()
                 .unwrap();
 
             let on_success = monkey_data[4]
