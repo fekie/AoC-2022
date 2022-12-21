@@ -5,22 +5,22 @@ const INPUT: &str = include_str!("../input.txt");
 /// If the inner value is `None`, it means to do the operation with itself (old * old).
 #[derive(Debug)]
 enum Operation {
-    Add(Option<u64>),
-    Multiply(Option<u64>),
+    Add(Option<u128>),
+    Multiply(Option<u128>),
 }
 
 #[derive(Debug)]
 struct Monkey {
     // We have to use a RefCell here as we need to mutably
     // change values, but not at the same time.
-    items: RefCell<Vec<u64>>,
+    items: RefCell<Vec<u128>>,
     operation: Operation,
-    divisible_by: u64,
+    divisible_by: u128,
     // If the worry value is divisble by self.divisble_by, throw to this monkey.
     on_success: usize,
     // Follows the same logic as self.on_succes
     on_fail: usize,
-    total_inspections: RefCell<u64>,
+    total_inspections: RefCell<u128>,
 }
 
 fn main() {
@@ -36,20 +36,20 @@ fn main() {
 
     let mut monkeys = generate_monkeys();
 
-    /* for _ in 0..10000 {
+    for _ in 0..10000 {
         run_cycle(&mut monkeys, false);
     }
 
     let monkey_business = calculate_monkey_business(&monkeys);
 
-    println!("Monkey Business (Part 2): {monkey_business}") */
+    println!("Monkey Business (Part 2): {monkey_business}")
 }
 
-fn calculate_monkey_business(monkeys: &[Monkey]) -> u64 {
+fn calculate_monkey_business(monkeys: &[Monkey]) -> u128 {
     let mut inspection_totals = monkeys
         .iter()
         .map(|x| *x.total_inspections.borrow())
-        .collect::<Vec<u64>>();
+        .collect::<Vec<u128>>();
 
     inspection_totals.sort();
 
@@ -62,11 +62,13 @@ fn calculate_monkey_business(monkeys: &[Monkey]) -> u64 {
 fn run_cycle(monkeys: &mut [Monkey], drop_worry_levels: bool) {
     for monkey in monkeys.iter() {
         // We drain as we're going to be moving these values to another inventory each time
-        for mut item in monkey.items.borrow_mut().drain(..).collect::<Vec<u64>>() {
+        for mut item in monkey.items.borrow_mut().drain(..).collect::<Vec<u128>>() {
             // For each item we increment the total inspections
             // Yes I have to assign values like this so they don't conflict
             let new_total_inspections = *monkey.total_inspections.borrow() + 1;
             *monkey.total_inspections.borrow_mut() = new_total_inspections;
+
+            dbg!(&item);
 
             // We do the monkey operation
             item = match monkey.operation {
@@ -104,8 +106,8 @@ fn generate_monkeys() -> Vec<Monkey> {
             let items = RefCell::new(
                 monkey_data[1].trim()[("Starting items: ").len()..]
                     .split(", ")
-                    .map(|x| x.parse::<u64>().unwrap())
-                    .collect::<Vec<u64>>(),
+                    .map(|x| x.parse::<u128>().unwrap())
+                    .collect::<Vec<u128>>(),
             );
 
             let operation = {
@@ -121,7 +123,7 @@ fn generate_monkeys() -> Vec<Monkey> {
             };
 
             let divisible_by = monkey_data[3].trim()["Test: divisible by ".len()..]
-                .parse::<u64>()
+                .parse::<u128>()
                 .unwrap();
 
             let on_success = monkey_data[4]
