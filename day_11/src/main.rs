@@ -27,12 +27,22 @@ fn main() {
     let mut monkeys = generate_monkeys();
 
     for _ in 0..20 {
-        run_cycle(&mut monkeys);
+        run_cycle(&mut monkeys, true);
     }
 
     let monkey_business = calculate_monkey_business(&monkeys);
 
-    println!("Monkey Business: {monkey_business}")
+    println!("Monkey Business (Part 1): {monkey_business}");
+
+    let mut monkeys = generate_monkeys();
+
+    /* for _ in 0..10000 {
+        run_cycle(&mut monkeys, false);
+    }
+
+    let monkey_business = calculate_monkey_business(&monkeys);
+
+    println!("Monkey Business (Part 2): {monkey_business}") */
 }
 
 fn calculate_monkey_business(monkeys: &[Monkey]) -> u64 {
@@ -43,17 +53,13 @@ fn calculate_monkey_business(monkeys: &[Monkey]) -> u64 {
 
     inspection_totals.sort();
 
-    /* dbg!(&inspection_totals); */
-
     let top = inspection_totals.pop().unwrap();
     let second_top = inspection_totals.pop().unwrap();
-
-    /* dbg!(top, second_top); */
 
     top * second_top
 }
 
-fn run_cycle(monkeys: &mut [Monkey]) {
+fn run_cycle(monkeys: &mut [Monkey], drop_worry_levels: bool) {
     for monkey in monkeys.iter() {
         // We drain as we're going to be moving these values to another inventory each time
         for mut item in monkey.items.borrow_mut().drain(..).collect::<Vec<u64>>() {
@@ -61,9 +67,6 @@ fn run_cycle(monkeys: &mut [Monkey]) {
             // Yes I have to assign values like this so they don't conflict
             let new_total_inspections = *monkey.total_inspections.borrow() + 1;
             *monkey.total_inspections.borrow_mut() = new_total_inspections;
-
-            /*  dbg!(&monkey.operation);
-            dbg!(&item); */
 
             // We do the monkey operation
             item = match monkey.operation {
@@ -77,10 +80,10 @@ fn run_cycle(monkeys: &mut [Monkey]) {
                 },
             };
 
-            /* dbg!(&item); */
-
-            // We do the worry divided by 3 (rounded down)
-            item /= 3;
+            // We do the worry divided by 3 (rounded down) if needed
+            if drop_worry_levels {
+                item /= 3;
+            }
 
             // We do the test and then throw it if needed
             match (item % monkey.divisible_by) == 0 {
@@ -117,12 +120,7 @@ fn generate_monkeys() -> Vec<Monkey> {
                 }
             };
 
-            let divisible_by = monkey_data[3]
-                .trim()
-                .chars()
-                .nth("Test: divisible by ".len())
-                .unwrap()
-                .to_string()
+            let divisible_by = monkey_data[3].trim()["Test: divisible by ".len()..]
                 .parse::<u64>()
                 .unwrap();
 
